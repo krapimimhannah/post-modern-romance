@@ -17,6 +17,7 @@ def get_playlist_uri(uri):
 
 # get all the tracks for that particular user
 def parse_search_queries(results):
+    playlist_title = results['name']
     tracks = results['tracks']['items']
 
     search_queries = []
@@ -31,10 +32,16 @@ def parse_search_queries(results):
         #     artists.append(artist['name'])
 
         first_artist = track['track']['artists'][0]['name']
-        search_query = ' '.join([title, first_artist])
+        search_query = ';;'.join([title, first_artist])
         search_queries.append(search_query)
 
-    return search_queries
+    return (playlist_title, search_queries)
+
+def get_search_queries(username, playlist_id):
+    results = sp.user_playlist(username, playlist_id)
+    playlist_title, search_queries = parse_search_queries(results)
+
+    return (playlist_title, search_queries)
 
 if __name__ == '__main__':
     if len(sys.argv) > 1:
@@ -43,7 +50,8 @@ if __name__ == '__main__':
         print("Usage: %s uri" % (sys.argv[0],))
         sys.exit()
 
-    username, playlist_id = get_playlist_uri(uri)
-    results = sp.user_playlist(username, playlist_id)
+    # TODO: how to handle cases of private playlists
+    # TODO: user client authentication
 
-    search_queries = parse_search_queries(results)
+    username, playlist_id = get_playlist_uri(uri)
+    print get_search_queries(username, playlist_id)
