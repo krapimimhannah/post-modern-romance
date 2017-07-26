@@ -4,7 +4,12 @@ import re
 import sys
 import os
 
-# just a test script
+
+def read_album(urn):
+    sp = spotipy.Spotify(client_credentials_manager=client_credentials_manager)
+    album = sp.album(urn)
+    tracks = [track['name'] for track in album['tracks']['items']]
+
 
 if __name__ == '__main__':
     if len(sys.argv) > 1:
@@ -15,7 +20,10 @@ if __name__ == '__main__':
 
     username, playlist_id = get_playlist_tracks.get_playlist_uri(uri)
 
-    playlist_title, search_queries = get_playlist_tracks.get_search_queries(username, playlist_id)
+    playlist_title, search_queries = get_playlist_tracks.get_search_queries(
+        username,
+        playlist_id
+    )
 
     for query in search_queries:
         song_title, artist_name = query.split(';;')
