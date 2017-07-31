@@ -11,6 +11,7 @@ headers = {'Authorization': bearer_token}
 # CRIBBD: https://stackoverflow.com/questions/4906977/access-environment-variables-from-python
 # securing environment variables
 
+
 def lyrics_from_song_api_path(song_api_path):
     song_url = base_url + song_api_path
     response = requests.get(song_url, headers=headers)
@@ -46,6 +47,7 @@ def run_search(directory, song_title, artist_name):
         lyrics = lyrics_from_song_api_path(song_api_path)
         output_file_name = "".join((char for char in song_title if char not in punctuation)).replace(" ", "_").lower() + '.txt'
 
+        print "Writing %s lyrics" % (output_file_name)
         text_file = open(directory + '/' + output_file_name, "w")
         for line in lyrics.splitlines():
             text_file.write(line.encode('utf8') + '\n')

@@ -8,6 +8,7 @@ import pprint
 client_credentials_manager = SpotifyClientCredentials()
 sp = spotipy.Spotify(client_credentials_manager=client_credentials_manager)
 
+
 # parse a playlist URI when clicking 'share' on spotify application
 # bless for fixed URL structure
 def get_playlist_uri(uri):
@@ -15,22 +16,22 @@ def get_playlist_uri(uri):
     playlist_id = uri.split(':')[4]
     return (username, playlist_id)
 
-# get all the tracks for that particular user
+
 def parse_search_queries(results):
     search_queries = []
-    for track in tracks:
-        # get the title of the track
-        title = track['track']['name']
-
+    for track in results:
+        if track['track'] is not None:
+            title = track['track']['name']
+            first_artist = track['track']['artists'][0]['name']
+            search_query = ';;'.join([title, first_artist])
+            search_queries.append(search_query)
+        else:
+            print track
         # for cases of multiple artists
         # UNFORT: hurts search results when its too specific
         # artists = []
         # for artist in track['track']['artists']:
         #     artists.append(artist['name'])
-
-        first_artist = track['track']['artists'][0]['name']
-        search_query = ';;'.join([title, first_artist])
-        search_queries.append(search_query)
 
     return search_queries
 
@@ -38,17 +39,23 @@ def parse_search_queries(results):
 def get_search_queries(username, playlist_id):
     results = sp.user_playlist(username, playlist_id)
     items = results['tracks']['items']
-    playlist_title = results['name']
-    while(results['tracks']['next']):
-        print 'getting more...'
-        results = sp.next(results['tracks'])
-        more_items = results['items']
-        items.append(more_items)
-    print items
+    next_uri = results['tracks']
 
-    # search_queries = parse_search_queries(items)
+    playlist_title = results['name']
+    if (results['tracks']['next']):
+        results = sp.next(next_uri)
+        more_items = results['items']
+        items.extend(more_items)
+
+    while(results['next']):
+        results = sp.next(results)
+        more_items = results['items']
+        items.extend(more_items)
+        print len(items)
+
+    search_queries = parse_search_queries(items)
     #
-    # return (playlist_title, search_queries)
+    return (playlist_title, search_queries)
 
 if __name__ == '__main__':
     if len(sys.argv) > 1:
