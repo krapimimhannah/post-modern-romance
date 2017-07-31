@@ -17,9 +17,6 @@ def get_playlist_uri(uri):
 
 # get all the tracks for that particular user
 def parse_search_queries(results):
-    playlist_title = results['name']
-    tracks = results['tracks']['items']
-
     search_queries = []
     for track in tracks:
         # get the title of the track
@@ -35,13 +32,23 @@ def parse_search_queries(results):
         search_query = ';;'.join([title, first_artist])
         search_queries.append(search_query)
 
-    return (playlist_title, search_queries)
+    return search_queries
+
 
 def get_search_queries(username, playlist_id):
     results = sp.user_playlist(username, playlist_id)
-    playlist_title, search_queries = parse_search_queries(results)
+    items = results['tracks']['items']
+    playlist_title = results['name']
+    while(results['tracks']['next']):
+        print 'getting more...'
+        results = sp.next(results['tracks'])
+        more_items = results['items']
+        items.append(more_items)
+    print items
 
-    return (playlist_title, search_queries)
+    # search_queries = parse_search_queries(items)
+    #
+    # return (playlist_title, search_queries)
 
 if __name__ == '__main__':
     if len(sys.argv) > 1:

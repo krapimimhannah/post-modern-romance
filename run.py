@@ -3,6 +3,19 @@ import get_playlist_tracks
 import re
 import sys
 import os
+from spotipy.oauth2 import SpotifyClientCredentials
+import spotipy
+
+
+def search(query):
+    client_credentials_manager = SpotifyClientCredentials()
+    sp = spotipy.Spotify(client_credentials_manager=client_credentials_manager)
+    result = sp.search(query, type='playlist')
+
+    results = []
+    for playlist in result['playlists']['items']:
+        results.append([playlist['name'], playlist['uri']])
+    return results
 
 
 def read_album(urn):
