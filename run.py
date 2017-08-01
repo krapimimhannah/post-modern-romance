@@ -6,7 +6,8 @@ import os
 from spotipy.oauth2 import SpotifyClientCredentials
 import spotipy
 
-def search(query):
+
+def search(query, names_only=False):
     client_credentials_manager = SpotifyClientCredentials()
     sp = spotipy.Spotify(client_credentials_manager=client_credentials_manager)
     result = sp.search(query, type='playlist')
@@ -14,9 +15,10 @@ def search(query):
     results = []
     for playlist in result['playlists']['items']:
         results.append([playlist['name'], playlist['uri']])
+    if not names_only:
+        results = get_tracks(results)
+    return results
 
-    track_results = get_tracks(results)
-    return track_results
 
 def get_tracks(playlist_search_results):
     all_tracks_for_search = []
