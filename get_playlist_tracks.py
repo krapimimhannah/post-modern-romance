@@ -47,11 +47,14 @@ def get_search_queries(username, playlist_id):
         more_items = results['items']
         items.extend(more_items)
 
-    while(results['next']):
-        results = sp.next(results)
-        more_items = results['items']
-        items.extend(more_items)
-        print len(items)
+    try:
+        while(results['next']):
+            results = sp.next(results)
+            more_items = results['items']
+            items.extend(more_items)
+            print len(items)
+    except:
+        print "Failed to retrieve tracks for %s" % (playlist_title)
 
     search_queries = parse_search_queries(items)
     #
